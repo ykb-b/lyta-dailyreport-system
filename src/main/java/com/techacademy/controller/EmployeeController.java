@@ -49,23 +49,13 @@ public class EmployeeController {
         return "employees/detail";
     }
 
-    /** 作成 */
-
-    // 従業員更新画面
-    @GetMapping(value = "/{code}/update")
-    public String edit(@PathVariable("code") String code, Model model) {
-        model.addAttribute("employee", employeeService.findByCode(code));
-        return "employees/update";
-    }
-
-    /** ここまで */
-
     // 従業員新規登録画面
     @GetMapping(value = "/add")
     public String create(@ModelAttribute Employee employee) {
 
         return "employees/new";
     }
+
 
     // 従業員新規登録処理
     @PostMapping(value = "/add")
@@ -108,6 +98,52 @@ public class EmployeeController {
 
         return "redirect:/employees";
     }
+
+    /** 作成 */
+
+    // 従業員更新画面
+    @GetMapping(value = "/{code}/update")
+    public String edit(@PathVariable("code") String code, Model model) {
+        /**直接メソッドを呼び出したときはスルーされる*/
+            model.addAttribute("employee", employeeService.findByCode(code));
+        return "employees/update";
+    }
+
+    public String edit(Model model) {
+        return "employees/update";
+    }
+
+    /** ここまで */
+
+    /** ここから*/
+
+    //従業員更新処理
+    @PostMapping(value="/{code}/update")
+    public String update(@Validated Employee employee, BindingResult res, Model model) {
+        if(res.hasErrors()) {
+            model.addAttribute("employee", employee);
+            return edit(model);
+        }
+
+        if("".equals(employee.getPassword())) {
+            Employee emptyPassEmployee = employeeService.findByCode(employee.getCode());
+            employee.setPassword(emptyPassEmployee.getPassword());
+            employeeService.emptyPassUpdate(employee);
+        } else {
+            ErrorKinds result = employeeService.update(employee);
+            if (ErrorMessage.contains(result)) {
+                model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+                return edit(model);
+            }
+        }
+
+
+
+        return "redirect:/employees";
+    }
+
+
+    /**ここまで*/
 
     // 従業員削除処理
     @PostMapping(value = "/{code}/delete")

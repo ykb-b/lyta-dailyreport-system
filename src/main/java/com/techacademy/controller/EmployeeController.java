@@ -104,7 +104,6 @@ public class EmployeeController {
     // 従業員更新画面
     @GetMapping(value = "/{code}/update")
     public String edit(@PathVariable("code") String code, Model model) {
-        /**直接メソッドを呼び出したときはスルーされる*/
             model.addAttribute("employee", employeeService.findByCode(code));
         return "employees/update";
     }

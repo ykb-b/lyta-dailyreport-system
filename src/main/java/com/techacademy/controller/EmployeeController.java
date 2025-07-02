@@ -53,7 +53,7 @@ public class EmployeeController {
     @GetMapping(value = "/add")
     public String create(@ModelAttribute Employee employee) {
 
-        return "employees/new";
+        return "employees/add";
     }
 
 

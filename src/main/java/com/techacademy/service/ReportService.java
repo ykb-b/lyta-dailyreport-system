@@ -22,9 +22,13 @@ public class ReportService {
         this.reportRepository = reportRepository;
     }
 
-    //日報全件検索
+    //管理者ユーザの日報検索
     public List<Report> findAll(){
         return reportRepository.findAll();
+    }
+    //一般ユーザの日報検索
+    public List<Report> findByEmployee(Employee employee){
+        return reportRepository.findByEmployee(employee);
     }
     //日報１件検索
     public Report findById(Integer id) {
@@ -48,7 +52,7 @@ public class ReportService {
         return ErrorKinds.SUCCESS;
     }
 
-    //従業員更新
+    //レポート更新
     @Transactional
     public ErrorKinds update(Report report, Employee emp) {
         Report dbReport = findById(report.getId());
@@ -68,7 +72,13 @@ public class ReportService {
     }
 
     //日報削除
-
+    @Transactional
+    public void delete(Integer id) {
+        Report report = findById(id);
+        LocalDateTime now = LocalDateTime.now();
+        report.setUpdatedAt(now);
+        report.setDeleteFlg(true);
+    }
     //日付チェック
     public ErrorKinds checkDate(Report report, Employee emp) {
         //日付検索しログインユーザと同一のユーザが既に登録していた場合エラー

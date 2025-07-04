@@ -3,6 +3,7 @@ package com.techacademy.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -21,6 +22,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name="reports")
+@SQLRestriction("delete_flg = false")
 public class Report {
 
     //日報ID

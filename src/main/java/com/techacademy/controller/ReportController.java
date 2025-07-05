@@ -33,9 +33,15 @@ public class ReportController {
 
     //日報一覧ページ
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("listSize", reportService.findAll().size());
-        model.addAttribute("reportList", reportService.findAll());
+    public String list(Model model, @AuthenticationPrincipal UserDetail userDetail) {
+        String role = userDetail.getAuthorities().toString();
+        if(role.contains("GENERAL")) {
+            model.addAttribute("listSize", reportService.findByEmployee(userDetail.getEmployee()).size());
+            model.addAttribute("reportList", reportService.findByEmployee(userDetail.getEmployee()));
+        } else if (role.contains("ADMIN")) {
+            model.addAttribute("listSize", reportService.findAll().size());
+            model.addAttribute("reportList", reportService.findAll());
+        }
         return "reports/list";
     }
 
@@ -96,10 +102,7 @@ public class ReportController {
         if (res.hasErrors()) {
             return updateErr(report);
         }
-        Report ckReport = reportService.findById(report.getId());
-        Employee emp = ckReport.getEmployee();
-
-        ErrorKinds result = reportService.update(report, emp);
+        ErrorKinds result = reportService.update(report);
         if (ErrorMessage.contains(result)) {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return updateErr(report);

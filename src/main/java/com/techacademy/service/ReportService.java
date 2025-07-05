@@ -54,20 +54,23 @@ public class ReportService {
 
     //レポート更新
     @Transactional
-    public ErrorKinds update(Report report, Employee emp) {
+    public ErrorKinds update(Report report) {
+        //日報IDからデータベースに現在登録されているレポートを取り出す
         Report dbReport = findById(report.getId());
-        ErrorKinds result;
-        if(dbReport.getReportDate() != report.getReportDate()) {
-            result = checkDate(report, emp);
+        //登録されている日報と登録しようとしている日報の指定日付が異なる場合日付チェックを行う
+        if(!report.getReportDate().equals(dbReport.getReportDate())) {
+            Employee emp = dbReport.getEmployee();
+            ErrorKinds result = checkDate(report, emp);
             if (ErrorKinds.CHECK_OK != result) {
                 return result;
             }
         }
-        report.setEmployee(emp);
+        dbReport.setReportDate(report.getReportDate());
+        dbReport.setTitle(report.getTitle());
+        dbReport.setContent(report.getContent());
         LocalDateTime now = LocalDateTime.now();
-        report.setCreatedAt(dbReport.getCreatedAt());
-        report.setUpdatedAt(now);
-        reportRepository.save(report);
+        dbReport.setUpdatedAt(now);
+        reportRepository.save(dbReport);
         return ErrorKinds.SUCCESS;
     }
 
